@@ -9,7 +9,7 @@ public class Professor {
     private String email;
     private LocalDate dataNascimento;
     private Double salarioBase;
-    //private Curso curso;
+    private Curso curso = null;
 
     public Professor() {
     }
@@ -20,7 +20,6 @@ public class Professor {
         this.email = email;
         this.dataNascimento = dataNascimento;
         this.salarioBase = salarioBase;
-        //this.curso = curso;
     }
 
     public Integer getId() {
@@ -63,18 +62,17 @@ public class Professor {
         this.salarioBase = salarioBase;
     }
 
+    public Curso getCurso() {
+        return curso;
+    }
+
+    public void setCurso(Curso curso) {
+        this.curso = curso;
+    }
+
     @Override
     public String toString() {
         return "Professor [id=" + id + ", nome=" + nome + ", email=" + email + ", dataNascimento=" + dataNascimento
-                + ", salarioBase=" + salarioBase + "]";
+                + ", salarioBase=" + salarioBase + ", curso=" + curso + "]";
     }
-
-    // public Curso getCurso() {
-    //     return curso;
-    // }
-
-    // public void setCurso(Curso curso) {
-    //     this.curso = curso;
-    // }
-
 }

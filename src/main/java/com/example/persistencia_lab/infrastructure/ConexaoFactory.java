@@ -2,7 +2,9 @@ package com.example.persistencia_lab.infrastructure;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import com.example.persistencia_lab.exceptions.BancoDeDadosException;
 
@@ -30,4 +32,27 @@ public class ConexaoFactory {
             return conexao;
         }
     }
+
+    public static void fecharStatement(Statement consulta){
+
+        if (consulta != null) {
+            try {
+                consulta.close();
+            } catch(SQLException e) {
+                throw new BancoDeDadosException(e.getMessage());
+            }
+        }
+    }
+
+    public static void fecharResultSet(ResultSet resultado){
+
+        if (resultado != null) {
+            try {
+                resultado.close();
+            } catch(SQLException e) {
+                throw new BancoDeDadosException(e.getMessage());
+            }
+        }
+    }
+
 }
