@@ -6,11 +6,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.stereotype.Repository;
+
 import com.example.persistencia_lab.exceptions.BancoDeDadosException;
 import com.example.persistencia_lab.infrastructure.ConexaoFactory;
 import com.example.persistencia_lab.models.Curso;
 import com.example.persistencia_lab.models.Professor;
 
+@Repository
 public class ProfessorRepository {
 
     private Connection conexao;
@@ -19,21 +22,34 @@ public class ProfessorRepository {
         conexao = ConexaoFactory.getConexao();
     }
 
-    public List<Professor> getProfessores(){
+    public List<Professor> getProfessores(Integer limite, Integer pagina, String nome){
         
         List<Professor> professores = new ArrayList<>();
         
-        Statement consulta = null;
+        PreparedStatement consulta = null;
         ResultSet resultado = null;
 
+        Integer offset = (pagina - 1 ) * limite;
+
         try {
-            
-            consulta = conexao.createStatement();
-            resultado = consulta.executeQuery(
-                "SELECT p.*, c.nome as curso_nome " 
+
+            String sql = "SELECT p.*, c.nome as curso_nome " 
                 + "FROM professores as p "
                 + "JOIN cursos as c " 
-                + "ON \tp.curso_id = c.curso_id");
+                + "ON p.curso_id = c.curso_id "
+
+                + "WHERE p.nome LIKE ? "
+                + "ORDER BY p.nome ASC "
+                + "LIMIT ? "
+                + "OFFSET ?";
+            
+            consulta = conexao.prepareStatement(sql);
+            
+            consulta.setString(1, "%" + nome + "%");
+            consulta.setInt(2, limite);
+            consulta.setInt(3, offset);
+
+            resultado = consulta.executeQuery();
 
 
             Map<Integer, Curso> cursosMap = new HashMap<>();
