@@ -27,9 +27,9 @@
         <h2 class="mb-4">Lista de Professores</h2>
 
         <!-- Formulário de Busca -->
-        <form class="row g-3 mb-4" method="get">
+        <form class="row g-3 mb-4" method="get" th:action="@{/professores}">
             <div class="col-md-9">
-                <input type="text" class="form-control" name="nome" placeholder="Buscar por nome">
+                <input type="text" class="form-control" name="nome" th:value="${nome}">
             </div>
             <div class="col-md-3">
                 <button type="submit" class="btn btn-primary w-100">Buscar</button>
@@ -69,15 +69,15 @@
             <ul class="pagination justify-content-center mt-4">
 
                 <li class="page-item">
-                    <a class="page-link" href="#">Anterior</a>
+                    <a class="page-link" th:href="@{/professores(pagina=${pagina - 1}, nome=${nome})}">Anterior</a>
                 </li>
 
                 <li class="page-item disabled">
-                    <span class="page-link">Página 1</span>
+                    <span class="page-link" th:text="${'Página ' + pagina}">Página ???</span>
                 </li>
 
                 <li class="page-item">
-                    <a class="page-link" href="#">Próxima</a>
+                    <a class="page-link" th:href="@{/professores(pagina=${pagina + 1}, nome=${nome})}">Próxima</a>
                 </li>
 
             </ul>

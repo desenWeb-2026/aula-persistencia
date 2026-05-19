@@ -129,14 +129,60 @@ public class ProfessorRepository {
 
     }
 
+    public Professor findProfessorByEmail(String email){
+                
+        PreparedStatement consulta = null;
+        ResultSet resultado = null;
+        Professor professor = null;
+
+        try {
+            
+            String sql = "SELECT p.*, c.nome as curso_nome " 
+                + "FROM professores as p "
+                + "JOIN cursos as c " 
+                + "ON p.curso_id = c.curso_id "
+                + "WHERE p.email = ?";
+
+            consulta = conexao.prepareStatement(sql);
+
+            consulta.setString(1, email);
+
+            resultado = consulta.executeQuery();
+
+
+            //Iterar nossa tabela de resultado
+            while (resultado.next()) {
+
+                Curso curso = new Curso();
+                curso.setCurso_id(resultado.getInt("curso_id"));
+                curso.setNome(resultado.getString("curso_nome"));
+
+                professor = resultadoToProfessor(resultado, curso);
+            }
+
+        } catch(SQLException e) {
+            throw new BancoDeDadosException(e.getMessage());
+        } finally {
+
+            ConexaoFactory.fecharStatement(consulta);
+            ConexaoFactory.fecharResultSet(resultado);
+
+        }
+
+        return professor;
+
+    }
+
     public Professor inserir(Professor professor){
+
+        System.out.println(professor);
 
         PreparedStatement consulta = null;
 
         try {
 
-            String sql  = "INSERT INTO professores (nome, email, data_nascimento, salario_base, curso_id) " +
-            "VALUES(?, ?, ?, ?, ?)";
+            String sql  = "INSERT INTO professores (nome, email, data_nascimento, salario_base, curso_id, senha) " +
+            "VALUES(?, ?, ?, ?, ?, ?)";
 
             consulta = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -145,6 +191,7 @@ public class ProfessorRepository {
             consulta.setDate(3, Date.valueOf(professor.getDataNascimento()));
             consulta.setDouble(4, professor.getSalarioBase());
             consulta.setInt(5, professor.getCurso().getCurso_id());
+            consulta.setString(6, professor.getSenha());
 
             int linhasAfetadas = consulta.executeUpdate();
 
@@ -181,11 +228,11 @@ public class ProfessorRepository {
         professor.setDataNascimento(resultado.getDate("data_nascimento").toLocalDate());
         professor.setSalarioBase(resultado.getDouble("salario_base"));
 
+        professor.setSenhaHashed(resultado.getString("senha"));
+
         professor.setCurso(curso);
 
         return professor;
     }
-
-    //sample
 
 }

@@ -4,6 +4,13 @@ public class Curso {
 
     private Integer curso_id;
     private String nome;
+
+    public Curso(){}
+
+    public Curso(Integer id, String nome){
+        this.curso_id = id;
+        this.nome = nome;
+    }
     
     public Integer getCurso_id() {
         return curso_id;
