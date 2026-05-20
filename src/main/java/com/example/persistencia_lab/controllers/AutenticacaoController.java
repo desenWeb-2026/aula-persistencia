@@ -1,36 +1,19 @@
 package com.example.persistencia_lab.controllers;
 
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import com.example.persistencia_lab.models.Professor;
-import com.example.persistencia_lab.repositories.ProfessorRepository;
-
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import com.example.persistencia_lab.services.AutenticacaoService;
 
 @Controller
 public class AutenticacaoController {
 
     @Autowired
-    private HttpSession session;
-
-    @Autowired
-    private HttpServletRequest request;
-
-    @Autowired
-    private HttpServletResponse response;
-
-    @Autowired
-    private ProfessorRepository repository;
+    AutenticacaoService autenticacaoService; 
 
     @GetMapping("/login")
     public String login() {
@@ -38,30 +21,28 @@ public class AutenticacaoController {
     }
 
     @PostMapping("/logar")
-    public String logar(String email, String senha) {
+    public String logar(Model model, String email, String senha) {
+        
+        try {
 
-        Professor professor = repository.findProfessorByEmail(email);
+            autenticacaoService.autenticar(email, senha);
+            return "redirect:/professores";
 
-        if (professor == null) {
-            throw new RuntimeException("e-mail invalido");
+        }catch (RuntimeException exception){
+
+            model.addAttribute("erro", exception.getMessage());
+            return "login";
+            
         }
-
-        PasswordEncoder encoder = new BCryptPasswordEncoder();
-
-        if (!encoder.matches(senha, professor.getSenha())) {
-            throw new RuntimeException("senha incorreta");
-        }
-
-        String sessaoId = UUID.randomUUID().toString();
-        session.setAttribute(sessaoId, professor);
-
-        Cookie cookie = new Cookie("APP_SESSID", sessaoId);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true); // inacessível por js, por exemplo
-
-        response.addCookie(cookie);
-
-        return "redirect:/professores";
     }
+
+    @GetMapping("/logout")
+    public String logout(){
+
+        autenticacaoService.logout();
+        return "redirect:/login";
+
+    }
+
 
 }
